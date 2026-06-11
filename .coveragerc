@@ -1,0 +1,4 @@
+[run]
+omit =
+    src/api_service_handler/storage/mongodb.py
+    src/api_service_handler/storage/postgresql.py
