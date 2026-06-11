@@ -14,16 +14,18 @@ A robust, async-first Python package for managing, rate-limiting, rotating, and 
 
 ## Installation
 
+Since the package is currently hosted on GitHub (not PyPI), you can install it using `uv` or `pip` by pointing directly to the repository and specifying a version tag.
+
 Install using `uv` (recommended):
 
 ```bash
-uv add api-service-handler
+uv add git+https://github.com/parkky21/apikeys-manager.git@v0.1.0
 ```
 
 Or using `pip`:
 
 ```bash
-pip install api-service-handler
+pip install git+https://github.com/parkky21/apikeys-manager.git@v0.1.0
 ```
 
 ### Optional Dependencies
@@ -31,10 +33,10 @@ If you plan to use MongoDB or PostgreSQL as your storage backend, install the re
 
 ```bash
 # For MongoDB support
-uv add "api-service-handler[mongodb]"
+uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.0#egg=api-service-handler[mongodb]"
 
 # For PostgreSQL support
-uv add "api-service-handler[postgresql]"
+uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.0#egg=api-service-handler[postgresql]"
 ```
 
 ## Quick Start
