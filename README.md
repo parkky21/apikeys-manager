@@ -1,51 +1,53 @@
-# API Service Handler
+<div align="center">
+  <h1>🚀 API Service Handler</h1>
+  <p><b>Enterprise-grade, async-first API key management for modern AI applications.</b></p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python Version" />
+    <img src="https://img.shields.io/badge/coverage-90%25-brightgreen.svg" alt="Test Coverage" />
+    <img src="https://img.shields.io/badge/asyncio-native-blueviolet.svg" alt="Asyncio" />
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License" />
+  </p>
+</div>
 
-A robust, async-first Python package for managing, rate-limiting, rotating, securely storing, and tracking usage of API keys across multiple providers (OpenAI, Anthropic, Google, custom, and many more). Designed for enterprise applications and LLM agent servers that need reliable, high-volume API key management.
+<br/>
 
----
-
-## Table of Contents
-1. [Core Features](#core-features)
-2. [Installation](#installation)
-3. [Configuration & Initialization](#configuration--initialization)
-4. [Storage Backends](#storage-backends)
-5. [Managing API Keys](#managing-api-keys)
-6. [Using Keys (Rotation & Rate Limiting)](#using-keys-rotation--rate-limiting)
-7. [Usage Tracking & Statistics](#usage-tracking--statistics)
-8. [CLI Tool (`ash`)](#cli-tool-ash)
-9. [Supported Providers](#supported-providers)
-
----
-
-## Core Features
-
-- **Asynchronous Architecture:** Built natively with `asyncio` for high-throughput, non-blocking applications.
-- **Smart Key Rotation:** Automatically distributes API calls using Round Robin, Weighted, Random, or Least Used strategies.
-- **Advanced Rate Limiting:** Enforces daily limits, monthly limits, and tracks concurrent active requests to prevent API throttling and unexpected billing overages.
-- **Auto-Resetting Counters:** Daily and monthly usage counters automatically reset when the calendar period rolls over.
-- **Bank-Grade Encryption:** Protects your API keys at rest using AES-256-GCM encryption.
-- **Multiple Storage Backends:** Choose between Memory, SQLite, MongoDB, or PostgreSQL.
-- **Extensible Metadata:** Tag keys and attach JSON metadata to query subsets of keys easily (e.g., `environment="production"`, `tags=["tier-1"]`).
+A robust, async-first Python package for managing, rate-limiting, rotating, securely storing, and tracking usage of API keys across multiple providers (OpenAI, Anthropic, Google, and many more). Designed for LLM agent servers that need reliable, high-volume API key management.
 
 ---
 
-## Installation
+## ✨ Core Features
 
-Since the package is currently hosted on GitHub (not PyPI), you can install it using `uv` or `pip` by pointing directly to the repository and specifying a version tag.
+| Feature | Description |
+| --- | --- |
+| ⚡ **Async Native** | Built entirely with `asyncio` for high-throughput, non-blocking applications. |
+| 🔄 **Smart Rotation** | Automatically distributes API calls using Round Robin, Weighted, Random, or Least Used strategies. |
+| 🛡️ **Rate Limiting** | Enforces daily, monthly, and concurrent usage limits to prevent throttling and unexpected billing overages. |
+| 🔐 **Bank-Grade Encryption** | Protects your API keys at rest using AES-256-GCM encryption. |
+| 🗄️ **Flexible Storage** | Choose between Memory, SQLite, MongoDB, or PostgreSQL backends out of the box. |
+| 🏷️ **Extensible Metadata** | Tag keys and attach JSON metadata to easily query subsets of keys (e.g., `environment="prod"`). |
 
-Install using `uv` (recommended):
+---
+
+## 📦 Installation
+
+Since the package is currently hosted on GitHub, you can install it using `uv` or `pip` by pointing directly to the repository and specifying a version tag.
+
+> [!TIP]
+> **Recommended:** Install using `uv` for lightning-fast dependency resolution.
 
 ```bash
 uv add git+https://github.com/parkky21/apikeys-manager.git@v0.1.0
 ```
 
-Or using `pip`:
-
+*Or using pip:*
 ```bash
 pip install git+https://github.com/parkky21/apikeys-manager.git@v0.1.0
 ```
 
-### Optional Database Dependencies
+<details>
+<summary><b>🗄️ Database Specific Extras (Click to expand)</b></summary>
+
 If you plan to use **MongoDB** or **PostgreSQL** as your storage backend, install the relevant extras:
 
 ```bash
@@ -56,13 +58,13 @@ uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.0#egg=api-servi
 uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.0#egg=api-service-handler[postgresql]"
 ```
 
+</details>
+
 ---
 
-## Configuration & Initialization
+## ⚙️ Configuration & Initialization
 
 The main entry point to the library is the `APIServiceHandler` class. It manages the connection to your underlying database, loads the encryption settings, and serves as the facade for all operations.
-
-### Programmatic Setup
 
 ```python
 import asyncio
@@ -73,16 +75,16 @@ async def main():
         storage_backend="sqlite",                   # memory, sqlite, mongodb, postgresql
         connection_string="sqlite:///api_keys.db",  # Path or URI to database
         encrypt_keys=True,                          # Strongly recommended
-        shared_secret="your-super-secret-32-byte-key-here!!!", # Used for AES-GCM encryption
+        shared_secret="your-super-secret-32-byte-key-here!!!", # Used for AES-GCM
         rotation_strategy="round_robin",            # round_robin, least_used, random, weighted
         auto_reset_counters=True,                   # Auto-refresh quotas on day/month rollover
         soft_delete=True                            # Keep deleted keys as "revoked" for auditing
     )
     
-    # You MUST initialize the handler to establish db connections/pools
+    # ⚠️ You MUST initialize the handler to establish db connections
     await handler.initialize()
     
-    print("API Service Handler is ready!")
+    print("🚀 API Service Handler is ready!")
     
     # Safely close connections before your app shuts down
     await handler.close()
@@ -91,29 +93,15 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-### Environment Variables
-You can configure the client purely using environment variables. If you omit parameters when instantiating `APIServiceHandler()`, it falls back to these:
-
-- `ASH_STORAGE_BACKEND`: `memory`, `sqlite`, `mongodb`, or `postgresql`
-- `ASH_CONNECTION_STRING`: Database URI
-- `ASH_SHARED_SECRET`: Secret key for AES encryption
-- `ASH_ROTATION_STRATEGY`: Default rotation strategy
+> [!NOTE]
+> **Environment Variables:** You can configure the client purely using environment variables (`ASH_STORAGE_BACKEND`, `ASH_CONNECTION_STRING`, `ASH_SHARED_SECRET`, `ASH_ROTATION_STRATEGY`).
 
 ---
 
-## Storage Backends
-
-1. **Memory (`memory`)**: Ideal for ephemeral testing and scripts. Data is lost on restart. No connection string required.
-2. **SQLite (`sqlite`)**: Great for local servers. `connection_string` should be `sqlite:///path/to/db.sqlite` or `sqlite:///:memory:`.
-3. **MongoDB (`mongodb`)**: Requires the `[mongodb]` extra (motor). Uses standard MongoDB URIs: `mongodb://user:pass@localhost:27017/dbname`.
-4. **PostgreSQL (`postgresql`)**: Requires the `[postgresql]` extra (asyncpg). Uses standard PostgreSQL URIs: `postgresql://user:pass@localhost:5432/dbname`.
-
----
-
-## Managing API Keys
+## 🔑 Managing API Keys
 
 ### Adding a Key
-Keys can be added one by one, or in bulk.
+Add keys dynamically with precise controls over their environments and usage thresholds.
 
 ```python
 from api_service_handler.models import Environment
@@ -132,55 +120,33 @@ key = await handler.add_key(
 )
 ```
 
-### Retrieving Keys
-Keys are retrieved as `APIKey` Pydantic models. By default, `key_value` is encrypted at rest and will remain encrypted or masked unless you explicitly ask to decrypt it.
+### Retrieving & Filtering
+Keys are retrieved as `APIKey` Pydantic models. **By default, `key_value` is encrypted at rest and will remain masked unless explicitly requested.**
 
 ```python
-# Get a specific key
+# Get a specific key (Decrypted)
 key = await handler.get_key(key_id="uuid-string", decrypt=True)
-print(key.key_value) # sk-proj-1234...
-
-# Get all keys for a provider
-anthropic_keys = await handler.get_keys_by_provider("anthropic")
 
 # Complex Filtering
 filtered_keys = await handler.get_all_keys(
     provider="google_gemini",
     tags=["premium"],
     environment="production",
-    has_capacity=True # Only returns keys that haven't hit rate/concurrency limits!
+    has_capacity=True # ✨ Magic! Only returns keys that haven't hit rate limits
 )
-```
-
-### Updating & Deleting
-```python
-# Update a key's alias and limit
-updated = await handler.update_key(
-    key.id, 
-    alias="new-alias", 
-    daily_limit=2000
-)
-
-# Soft delete (marks as revoked)
-await handler.delete_key(key.id, hard=False)
-
-# Hard delete (completely removes from DB)
-await handler.delete_key(key.id, hard=True)
 ```
 
 ---
 
-## Using Keys (Rotation & Rate Limiting)
+## ♻️ Using Keys (Rotation & Rate Limiting)
 
 The core purpose of this library is to safely dispense API keys while preventing you from hitting provider rate limits. 
 
-The **safest and easiest** way to retrieve a key is using the `use_key` context manager. It will:
-1. Find an active key for the requested provider.
-2. Filter out keys that have hit their Daily/Monthly limits.
-3. Filter out keys that have hit their Max Concurrent usage limit.
-4. Rotate between the valid keys based on your strategy (e.g. Round Robin).
-5. Increment the concurrent usage counter.
-6. Once the `async with` block exits, it decrements the concurrent counter and increments the total/daily/monthly usage counts.
+The **safest and easiest** way to retrieve a key is using the `use_key` context manager. It automatically:
+1. Filters out keys that have hit their Daily/Monthly limits.
+2. Filters out keys that have hit their Max Concurrent limit.
+3. Rotates between valid keys based on your strategy.
+4. Safely tracks parallel execution blocks and historical usage.
 
 ```python
 from api_service_handler.exceptions import RateLimitExceededError, NoAvailableKeyError, MaxConcurrentExceededError
@@ -192,22 +158,21 @@ async def generate_text(prompt: str):
             
             # The key is automatically decrypted and ready to use
             raw_key = api_key.key_value
-            
-            # Pass the raw_key into your SDK of choice
-            # response = await my_llm_client.chat(api_key=raw_key, messages=prompt)
             print(f"Executing request with {api_key.alias}")
             
+            # response = await my_llm_client.chat(api_key=raw_key, messages=prompt)
+            
     except NoAvailableKeyError:
-        print("No active Anthropic keys found!")
+        print("❌ No active Anthropic keys found!")
     except RateLimitExceededError as e:
-        print(f"All keys are rate limited! {e}")
+        print(f"🛑 All keys are rate limited! {e}")
     except MaxConcurrentExceededError as e:
-        print(f"Too many parallel requests active right now! {e}")
+        print(f"⚠️ Too many parallel requests active right now! {e}")
 ```
 
 ---
 
-## Usage Tracking & Statistics
+## 📊 Usage Tracking & Statistics
 
 Track exactly how much your APIs are being utilized. Counters auto-reset at the start of a new calendar day/month based on UTC time.
 
@@ -215,76 +180,50 @@ Track exactly how much your APIs are being utilized. Counters auto-reset at the 
 # Get usage for a specific key
 stats = await handler.get_usage_stats(key.id)
 print(f"Daily remaining: {stats.daily_remaining}")
-print(f"Total historical uses: {stats.total_usage_count}")
 
 # Get aggregated usage across all keys for a provider
 provider_stats = await handler.get_provider_stats("openai")
 for stat in provider_stats:
     print(f"{stat.alias}: {stat.daily_usage_count} uses today")
-
-# Manually force a reset of daily counters across all keys
-reset_count = await handler.reset_daily_counts()
-print(f"Reset daily limits for {reset_count} keys.")
 ```
 
 ---
 
-## CLI Tool (`ash`)
+## 💻 CLI Tool (`ash`)
 
 A full-featured command-line utility is bundled with the package for administrative tasks.
 
-Ensure you have your environment variables exported so the CLI connects to your production database:
-```bash
-export ASH_STORAGE_BACKEND="postgresql"
-export ASH_CONNECTION_STRING="postgresql://user:pass@localhost/db"
-export ASH_SHARED_SECRET="my-super-secret-key"
-```
+> [!IMPORTANT]
+> Ensure you have your environment variables exported so the CLI connects to your production database!
+> `export ASH_CONNECTION_STRING="postgresql://user:pass@localhost/db"`
 
-### CLI Commands
-
-**Adding a Key**
-```bash
-ash keys add --provider openai --key "sk-proj-xyz" --alias "prod-1" --daily-limit 5000
-```
-
-**Listing Keys**
-```bash
-ash keys list
-ash keys list --json
-ash keys list --provider anthropic --show-keys
-```
-
-**Viewing Key Info**
-```bash
-ash keys get <key_id>
-```
-
-**Updating & Deleting**
-```bash
-ash keys update <key_id> --alias "new-name" --status inactive
-ash keys delete <key_id> --hard
-```
-
-**Usage & Diagnostics**
-```bash
-ash usage stats <key_id>
-ash usage reset-daily
-ash health
-ash info
-```
+| Command | Description | Example |
+| :--- | :--- | :--- |
+| `ash keys add` | Add a new key | `ash keys add --provider openai --key "sk-xyz" --alias "prod"` |
+| `ash keys list` | List all keys visually | `ash keys list --provider anthropic --show-keys` |
+| `ash keys get` | View detailed key info | `ash keys get <key_id>` |
+| `ash keys update`| Update aliases or limits | `ash keys update <key_id> --alias "new-name"` |
+| `ash keys delete`| Soft/Hard delete a key | `ash keys delete <key_id> --hard` |
+| `ash usage stats`| View limit vs usage data | `ash usage stats <key_id>` |
+| `ash health` | Test DB connection | `ash health` |
 
 ---
 
-## Supported Providers
+## 🌐 Supported Providers
 
-The library enforces strict string enums for API providers. When providing the `provider` string, you can use any of the following (case-insensitive):
+The library enforces strict string enums for API providers. You can use any of the following (case-insensitive):
 
-- **AI / LLM:** `openai`, `anthropic`, `google_gemini`, `google_vertex`, `mistral`, `cohere`, `huggingface`, `replicate`, `together_ai`, `groq`, `fireworks`, `deepseek`, `xai`, `perplexity`, `openrouter`
-- **Speech / Audio:** `deepgram`, `eleven_labs`, `assembly_ai`, `whisper`
-- **Cloud & Auth:** `aws`, `azure`, `gcp`, `cloudflare`, `vercel`, `auth0`, `clerk`, `supabase_auth`
-- **Communication:** `twilio`, `sendgrid`, `mailgun`, `resend`, `postmark`
-- **Payments:** `stripe`, `razorpay`, `paypal`, `lemonsqueezy`
-- **Search & Vector:** `serp_api`, `bing_search`, `algolia`, `pinecone`, `weaviate`
-- **Misc:** `github`, `slack`, `discord`, `custom`
+<details open>
+<summary><b>Click to see full list</b></summary>
+
+- **🤖 AI / LLM:** `openai`, `anthropic`, `google_gemini`, `google_vertex`, `mistral`, `cohere`, `huggingface`, `replicate`, `together_ai`, `groq`, `fireworks`, `deepseek`, `xai`, `perplexity`, `openrouter`
+- **🎙️ Speech / Audio:** `deepgram`, `eleven_labs`, `assembly_ai`, `whisper`
+- **☁️ Cloud & Auth:** `aws`, `azure`, `gcp`, `cloudflare`, `vercel`, `auth0`, `clerk`, `supabase_auth`
+- **💬 Communication:** `twilio`, `sendgrid`, `mailgun`, `resend`, `postmark`
+- **💳 Payments:** `stripe`, `razorpay`, `paypal`, `lemonsqueezy`
+- **🔍 Search & Vector:** `serp_api`, `bing_search`, `algolia`, `pinecone`, `weaviate`
+- **🔧 Misc:** `github`, `slack`, `discord`, `custom`
 
 *(If a provider isn't strictly typed, it will safely fallback to `"custom"`, though you can also just pass `"custom"`).*
+
+</details>
