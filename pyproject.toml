@@ -1,0 +1,71 @@
+[project]
+name = "api-service-handler"
+version = "0.1.0"
+description = "Enterprise API key management: rotation, rate-limiting, usage tracking, multi-backend storage"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Parkky", email = "parth.kale.dev@gmail.com" },
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+keywords = ["api", "key-management", "rotation", "rate-limiting", "service-handler"]
+dependencies = [
+    "pydantic>=2.0",
+    "cryptography>=41.0",
+    "click>=8.0",
+    "rich>=13.0",
+    "tabulate>=0.9",
+]
+
+[project.optional-dependencies]
+mongodb = ["motor>=3.0,<4.0"]
+postgresql = ["asyncpg>=0.27,<1.0"]
+sqlite = ["aiosqlite>=0.19,<1.0"]
+all = [
+    "motor>=3.0,<4.0",
+    "asyncpg>=0.27,<1.0",
+    "aiosqlite>=0.19,<1.0",
+]
+
+[project.scripts]
+ash = "api_service_handler.cli:cli"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "aiosqlite>=0.19,<1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = "--cov=api_service_handler --cov-report=term-missing"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+omit = [
+    "src/api_service_handler/storage/mongodb.py",
+    "src/api_service_handler/storage/postgresql.py"
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
