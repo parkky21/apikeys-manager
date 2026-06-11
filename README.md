@@ -136,6 +136,25 @@ filtered_keys = await handler.get_all_keys(
 )
 ```
 
+### 🎯 Metadata Filtering (Deep Search)
+You can attach arbitrary JSON metadata to any key and query against it. All storage backends (including Memory & SQLite) natively support filtering by nested metadata using dot-notation!
+
+```python
+# Returns only keys assigned to the engineering team
+engineering_keys = await handler.get_all_keys(
+    metadata_filter={"team": "engineering"}
+)
+
+# Nested JSON matching using dot-notation!
+enterprise_keys = await handler.get_all_keys(
+    metadata_filter={"billing.tier": "enterprise"}
+)
+
+# You can even route requests strictly based on metadata!
+async with handler.use_key(provider="openai", metadata_filter={"project_id": "proj-789"}) as p_key:
+    pass
+```
+
 ---
 
 ## ♻️ Using Keys (Rotation & Rate Limiting)
