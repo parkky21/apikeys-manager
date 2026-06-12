@@ -57,6 +57,8 @@ class ASHConfig:
         Default monthly request cap applied to newly created keys.
     default_max_concurrent:
         Default maximum number of concurrent in-flight requests per key.
+    metadata_indexes:
+        List of metadata keys to create compound indexes for (e.g. ['client_id']).
     """
 
     # Storage
@@ -76,6 +78,7 @@ class ASHConfig:
     default_daily_limit: Optional[int] = None
     default_monthly_limit: Optional[int] = None
     default_max_concurrent: Optional[int] = None
+    metadata_indexes: list[str] = field(default_factory=list)
 
     # ------------------------------------------------------------------
     # Post-init: resolve env-var fallbacks & validate
@@ -170,4 +173,5 @@ def get_config_from_env() -> ASHConfig:
         default_daily_limit=_env_optional_int("ASH_DEFAULT_DAILY_LIMIT"),
         default_monthly_limit=_env_optional_int("ASH_DEFAULT_MONTHLY_LIMIT"),
         default_max_concurrent=_env_optional_int("ASH_DEFAULT_MAX_CONCURRENT"),
+        metadata_indexes=[x.strip() for x in os.environ.get("ASH_METADATA_INDEXES", "").split(",")] if os.environ.get("ASH_METADATA_INDEXES") else [],
     )

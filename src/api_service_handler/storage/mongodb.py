@@ -29,14 +29,16 @@ class MongoDBStorageBackend(StorageBackend):
     Install with: pip install api-service-handler[mongodb]
     """
 
-    def __init__(self, connection_string: str) -> None:
+    def __init__(self, connection_string: str, metadata_indexes: Optional[list[str]] = None) -> None:
         """Initialize MongoDB backend.
 
         Args:
             connection_string: MongoDB connection URI, e.g., 'mongodb://localhost:27017/my_db'.
+            metadata_indexes: List of metadata keys to create compound indexes for.
         """
         self._motor = _try_import_motor()
         self._connection_string = connection_string
+        self._metadata_indexes = metadata_indexes or []
         self._client = None
         self._db = None
         self._collection = None
@@ -66,14 +68,15 @@ class MongoDBStorageBackend(StorageBackend):
                 [("provider", pymongo.ASCENDING), ("status", pymongo.ASCENDING)]
             )
             
-            # Compound index for metadata client_id filters
-            await self._collection.create_index(
-                [
-                    ("provider", pymongo.ASCENDING), 
-                    ("status", pymongo.ASCENDING), 
-                    ("metadata.client_id", pymongo.ASCENDING)
-                ]
-            )
+            # Dynamic compound indexes for metadata
+            for md_key in self._metadata_indexes:
+                await self._collection.create_index(
+                    [
+                        ("provider", pymongo.ASCENDING), 
+                        ("status", pymongo.ASCENDING), 
+                        (f"metadata.{md_key}", pymongo.ASCENDING)
+                    ]
+                )
             
             # Unique compound index for active keys to prevent duplicates
             try:

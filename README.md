@@ -37,12 +37,12 @@ Since the package is currently hosted on GitHub, you can install it using `uv` o
 > **Recommended:** Install using `uv` for lightning-fast dependency resolution.
 
 ```bash
-uv add git+https://github.com/parkky21/apikeys-manager.git@v0.1.4
+uv add git+https://github.com/parkky21/apikeys-manager.git@v0.1.5
 ```
 
 *Or using pip:*
 ```bash
-pip install git+https://github.com/parkky21/apikeys-manager.git@v0.1.4
+pip install git+https://github.com/parkky21/apikeys-manager.git@v0.1.5
 ```
 
 <details>
@@ -52,10 +52,10 @@ If you plan to use **MongoDB** or **PostgreSQL** as your storage backend, instal
 
 ```bash
 # For MongoDB support
-uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.4#egg=api-service-handler[mongodb]"
+uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.5#egg=api-service-handler[mongodb]"
 
 # For PostgreSQL support
-uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.4#egg=api-service-handler[postgresql]"
+uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.5#egg=api-service-handler[postgresql]"
 ```
 
 </details>

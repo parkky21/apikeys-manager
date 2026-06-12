@@ -55,7 +55,7 @@ def _create_storage(config: ASHConfig) -> StorageBackend:
 
     elif backend == "mongodb":
         from .storage.mongodb import MongoDBStorageBackend
-        return MongoDBStorageBackend(config.connection_string)
+        return MongoDBStorageBackend(config.connection_string, metadata_indexes=config.metadata_indexes)
 
     elif backend == "postgresql":
         from .storage.postgresql import PostgreSQLStorageBackend
@@ -116,6 +116,7 @@ class APIServiceHandler:
         default_daily_limit: Optional[int] = None,
         default_monthly_limit: Optional[int] = None,
         default_max_concurrent: Optional[int] = None,
+        metadata_indexes: Optional[list[str]] = None,
         config: Optional[ASHConfig] = None,
     ) -> None:
         """Initialize the API Service Handler.
@@ -131,6 +132,7 @@ class APIServiceHandler:
             default_daily_limit: Default daily limit for new keys.
             default_monthly_limit: Default monthly limit for new keys.
             default_max_concurrent: Default max concurrent for new keys.
+            metadata_indexes: List of metadata keys to compound index with provider (e.g. ['client_id']).
             config: Optional pre-built ASHConfig (overrides individual params).
         """
         if config:
@@ -147,6 +149,7 @@ class APIServiceHandler:
                 default_daily_limit=default_daily_limit,
                 default_monthly_limit=default_monthly_limit,
                 default_max_concurrent=default_max_concurrent,
+                metadata_indexes=metadata_indexes or [],
             )
 
         self._storage: StorageBackend = _create_storage(self._config)
