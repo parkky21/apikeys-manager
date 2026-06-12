@@ -438,6 +438,10 @@ class APIServiceHandler:
     async def get_next_key(
         self,
         provider: Provider | str,
+        environment: Optional[Environment | str] = None,
+        tags: Optional[list[str]] = None,
+        metadata_filter: Optional[dict[str, Any]] = None,
+        alias_contains: Optional[str] = None,
         decrypt: bool = True,
     ) -> APIKey:
         """Get the next available key for a provider using the rotation strategy.
@@ -446,9 +450,14 @@ class APIServiceHandler:
         - Counter resets (daily/monthly)
         - Skipping rate-limited, expired, or inactive keys
         - Round-robin, least-used, random, or weighted selection
+        - Filtering by environment, tags, metadata, and alias
 
         Args:
             provider: The API provider.
+            environment: Optional environment filter.
+            tags: Optional tags filter.
+            metadata_filter: Optional metadata filter.
+            alias_contains: Optional alias substring filter.
             decrypt: If True, decrypt the key value.
 
         Returns:
@@ -462,8 +471,14 @@ class APIServiceHandler:
         if isinstance(provider, str):
             provider = Provider.from_string(provider)
 
-        # Get all keys for the provider
-        keys = await self._storage.get_keys_by_provider(provider)
+        # Get all keys for the provider matching filters
+        keys = await self.get_all_keys(
+            provider=provider,
+            environment=environment,
+            tags=tags,
+            metadata_filter=metadata_filter,
+            alias_contains=alias_contains,
+        )
 
         # Auto-reset stale counters
         if self._rate_limiter:
@@ -487,6 +502,10 @@ class APIServiceHandler:
     async def use_key(
         self,
         provider: Provider | str,
+        environment: Optional[Environment | str] = None,
+        tags: Optional[list[str]] = None,
+        metadata_filter: Optional[dict[str, Any]] = None,
+        alias_contains: Optional[str] = None,
         decrypt: bool = True,
     ) -> AsyncIterator[APIKey]:
         """Context manager for using a key with automatic lifecycle management.
@@ -496,6 +515,10 @@ class APIServiceHandler:
 
         Args:
             provider: The API provider.
+            environment: Optional environment filter.
+            tags: Optional tags filter.
+            metadata_filter: Optional metadata filter.
+            alias_contains: Optional alias substring filter.
             decrypt: If True, decrypt the key value.
 
         Yields:
@@ -510,7 +533,14 @@ class APIServiceHandler:
         self._ensure_initialized()
 
         # Select the next key
-        key = await self.get_next_key(provider, decrypt=decrypt)
+        key = await self.get_next_key(
+            provider=provider,
+            environment=environment,
+            tags=tags,
+            metadata_filter=metadata_filter,
+            alias_contains=alias_contains,
+            decrypt=decrypt,
+        )
 
         # Acquire concurrent slot and manage lifecycle
         assert self._usage_tracker is not None
