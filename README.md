@@ -37,12 +37,12 @@ Since the package is currently hosted on GitHub, you can install it using `uv` o
 > **Recommended:** Install using `uv` for lightning-fast dependency resolution.
 
 ```bash
-uv add git+https://github.com/parkky21/apikeys-manager.git@v0.1.1
+uv add git+https://github.com/parkky21/apikeys-manager.git@v0.1.2
 ```
 
 *Or using pip:*
 ```bash
-pip install git+https://github.com/parkky21/apikeys-manager.git@v0.1.1
+pip install git+https://github.com/parkky21/apikeys-manager.git@v0.1.2
 ```
 
 <details>
@@ -52,10 +52,10 @@ If you plan to use **MongoDB** or **PostgreSQL** as your storage backend, instal
 
 ```bash
 # For MongoDB support
-uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.1#egg=api-service-handler[mongodb]"
+uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.2#egg=api-service-handler[mongodb]"
 
 # For PostgreSQL support
-uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.1#egg=api-service-handler[postgresql]"
+uv add "git+https://github.com/parkky21/apikeys-manager.git@v0.1.2#egg=api-service-handler[postgresql]"
 ```
 
 </details>
@@ -235,7 +235,7 @@ The library enforces strict string enums for API providers. You can use any of t
 <details open>
 <summary><b>Click to see full list</b></summary>
 
-- **🤖 AI / LLM:** `openai`, `anthropic`, `google_gemini`, `google_vertex`, `mistral`, `cohere`, `huggingface`, `replicate`, `together_ai`, `groq`, `fireworks`, `deepseek`, `xai`, `perplexity`, `openrouter`
+- **🤖 AI / LLM:** `openai`, `anthropic`, `google_gemini`, `google_vertex`, `mistral`, `cohere`, `huggingface`, `replicate`, `together_ai`, `groq`, `fireworks`, `deepseek`, `xai`, `perplexity`, `openrouter`, `lemofox`
 - **🎙️ Speech / Audio:** `deepgram`, `eleven_labs`, `assembly_ai`, `whisper`
 - **☁️ Cloud & Auth:** `aws`, `azure`, `gcp`, `cloudflare`, `vercel`, `auth0`, `clerk`, `supabase_auth`
 - **💬 Communication:** `twilio`, `sendgrid`, `mailgun`, `resend`, `postmark`

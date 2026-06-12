@@ -36,6 +36,7 @@ class Provider(str, Enum):
     XAI = "xai"
     PERPLEXITY = "perplexity"
     OPENROUTER = "openrouter"
+    LEMOFOX = "lemofox"
 
     # --- Speech / Audio ---
     DEEPGRAM = "deepgram"
