@@ -67,11 +67,18 @@ class MongoDBStorageBackend(StorageBackend):
             )
             
             # Unique compound index for active keys to prevent duplicates
-            await self._collection.create_index(
-                [("key_value", pymongo.ASCENDING), ("provider", pymongo.ASCENDING)],
-                unique=True,
-                partialFilterExpression={"status": {"$ne": "revoked"}}
-            )
+            try:
+                await self._collection.create_index(
+                    [("key_value", pymongo.ASCENDING), ("provider", pymongo.ASCENDING)],
+                    unique=True,
+                    partialFilterExpression={"status": {"$ne": "revoked"}}
+                )
+            except pymongo.errors.OperationFailure:
+                # Fallback for AWS DocumentDB which does not support $ne in partial index
+                await self._collection.create_index(
+                    [("key_value", pymongo.ASCENDING), ("provider", pymongo.ASCENDING)],
+                    unique=True
+                )
 
             self._initialized = True
         except Exception as e:
