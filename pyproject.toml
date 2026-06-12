@@ -1,6 +1,6 @@
 [project]
 name = "api-service-handler"
-version = "0.1.3"
+version = "0.1.4"
 description = "Enterprise API key management: rotation, rate-limiting, usage tracking, multi-backend storage"
 readme = "README.md"
 license = "MIT"

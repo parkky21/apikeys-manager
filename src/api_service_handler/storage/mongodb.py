@@ -66,6 +66,15 @@ class MongoDBStorageBackend(StorageBackend):
                 [("provider", pymongo.ASCENDING), ("status", pymongo.ASCENDING)]
             )
             
+            # Compound index for metadata client_id filters
+            await self._collection.create_index(
+                [
+                    ("provider", pymongo.ASCENDING), 
+                    ("status", pymongo.ASCENDING), 
+                    ("metadata.client_id", pymongo.ASCENDING)
+                ]
+            )
+            
             # Unique compound index for active keys to prevent duplicates
             try:
                 await self._collection.create_index(
