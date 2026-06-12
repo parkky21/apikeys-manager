@@ -32,7 +32,12 @@ from .models import (
     UsageStats,
 )
 
-__version__ = "0.1.0"
+import importlib.metadata
+
+try:
+    __version__ = importlib.metadata.version("api-service-handler")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"
 __all__ = [
     # Main clients
     "APIServiceHandler",
